@@ -13,11 +13,11 @@ export class TodoController {
   }
 
   addTask(description, type) {
-    const task = this.todoService.addTask(description, type);
-    if (task) {
-      this.todoRenderer.render(this.todoService, task.id);
+    const newId = this.todoService.addTask(description, type);
+    if (newId) {
+      this.todoRenderer.render(this.todoService, newId);
     }
-    return task;
+    return newId;
   }
 
   toggleTask(id) {

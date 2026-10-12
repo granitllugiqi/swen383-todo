@@ -8,7 +8,7 @@ export class TodoService {
     const trimmed = description.trim();
     if (trimmed.length < 3) {
       alert('Task needs at least a few characters.');
-      return false;
+      return null;
     }
 
     if (this.tasks.length >= 20) {
@@ -30,7 +30,7 @@ export class TodoService {
 
     this.tasks.push(task);
     this.storageHandler.save(this.tasks);
-    return task;
+    return task.id;
   }
 
   toggleComplete(id) {
