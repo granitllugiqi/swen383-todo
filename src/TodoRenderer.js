@@ -1,37 +1,22 @@
 export class TodoRenderer {
-  constructor(containerId, todoService) {
+  constructor(containerId) {
     this.container = document.getElementById(containerId);
-    this.todoService = todoService;
+    this.actions = { onToggle() {}, onDelete() {} };
   }
 
-  bindControls() {
-    const input = document.getElementById('task-input');
-    const addButton = document.getElementById('add-task-btn');
-    const addUrgentButton = document.getElementById('add-urgent-btn');
-
-    addButton.addEventListener('click', () => this.addTask(input, 'simple'));
-    addUrgentButton.addEventListener('click', () => this.addTask(input, 'urgent'));
-    input.addEventListener('keydown', event => {
-      if (event.key === 'Enter') addButton.click();
-    });
+  bindActions(actions) {
+    this.actions = actions;
   }
 
-  addTask(input, type) {
-    const task = this.todoService.addTask(input.value, type);
-    if (!task) return;
-    input.value = '';
-    this.render(task.id);
-  }
-
-  renderPendingRows() {
-    return this.todoService.tasks
+  renderPendingRows(service) {
+    return service.tasks
       .filter(task => !task.completed)
       .map(task => this.buildTaskRow(task))
       .join('');
   }
 
-  renderCompletedRows() {
-    return this.todoService.tasks
+  renderCompletedRows(service) {
+    return service.tasks
       .filter(task => task.completed)
       .map(task => this.buildTaskRow(task))
       .join('');
@@ -52,51 +37,27 @@ export class TodoRenderer {
     </li>`;
   }
 
-  summarizeWorkload() {
-    let done = 0;
-    let urgent = 0;
-    let normal = 0;
-
-    for (const task of this.todoService.tasks) {
-      if (task.completed) {
-        done++;
-      } else if (task.priority === 'high') {
-        urgent++;
-      } else {
-        normal++;
-      }
-    }
-
-    return `${done}/${this.todoService.tasks.length} done - ${urgent} urgent, ${normal} normal remaining`;
-  }
-
-  render(justAddedId) {
+  render(service, justAddedId) {
     if (!this.container) return;
 
-    const pendingHtml = this.renderPendingRows();
-    const completedHtml = this.renderCompletedRows();
-    const oldestPending = this.todoService.tasks.find(task => !task.completed);
+    const pendingHtml = this.renderPendingRows(service);
+    const completedHtml = this.renderCompletedRows(service);
+    const oldestPending = service.tasks.find(task => !task.completed);
     const oldestPendingLabel = oldestPending ? oldestPending.desc : 'none';
 
     this.container.innerHTML =
-      `<p class="status">${this.summarizeWorkload()} - oldest: ${oldestPendingLabel}</p>` +
+      `<p class="status">${service.getWorkloadSummary()} - oldest: ${oldestPendingLabel}</p>` +
       '<h2 class="section-title">To do</h2>' +
       `<ul>${pendingHtml || '<li>Nothing pending. Add a task above.</li>'}</ul>` +
       '<h2 class="section-title">Completed</h2>' +
       `<ul>${completedHtml || '<li>Nothing completed yet.</li>'}</ul>`;
 
     for (const button of this.container.querySelectorAll('[data-toggle]')) {
-      button.addEventListener('click', () => {
-        this.todoService.toggleComplete(Number(button.dataset.toggle));
-        this.render();
-      });
+      button.addEventListener('click', () => this.actions.onToggle(Number(button.dataset.toggle)));
     }
 
     for (const button of this.container.querySelectorAll('[data-delete]')) {
-      button.addEventListener('click', () => {
-        this.todoService.deleteTask(Number(button.dataset.delete));
-        this.render();
-      });
+      button.addEventListener('click', () => this.actions.onDelete(Number(button.dataset.delete)));
     }
 
     if (justAddedId) {
@@ -107,6 +68,6 @@ export class TodoRenderer {
       }
     }
 
-    document.title = `Todo (${this.todoService.tasks.filter(task => !task.completed).length})`;
+    document.title = `Todo (${service.tasks.filter(task => !task.completed).length})`;
   }
 }
