@@ -3,10 +3,11 @@ import { TodoRenderer } from './TodoRenderer.js';
 import { TodoController } from './TodoController.js';
 import { IdeaBox } from './IdeaBox.js';
 import { IdeaBoxAdapter } from './IdeaBoxAdapter.js';
+import { LoggingTodoServiceDecorator } from './LoggingTodoServiceDecorator.js';
 
 window.addEventListener('DOMContentLoaded', () => {
   const factory = new LocalStorageFactory();
-  const todoService = factory.createService();
+  const todoService = new LoggingTodoServiceDecorator(factory.createService());
   const todoRenderer = new TodoRenderer('task-container');
   const todoController = new TodoController(todoService, todoRenderer);
 
