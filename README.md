@@ -32,11 +32,10 @@ The app has ten JavaScript files in `src/`:
 | `TaskBuilder.js` | Assembles tasks from a description and optional priority and label. |
 
 `index.html` defines the page and `style.css` provides its styling. Editable design
-sources and the lab check record are in `docs/`:
+sources are in `docs/`:
 
 - [Class diagram](docs/class-diagram.puml)
 - [Add Task sequence](docs/sequence-add-task.puml)
-- [Week 6 verification](docs/week6-verification.md)
 
 ## Design
 
@@ -102,9 +101,6 @@ With the app running through an HTTP server:
 5. Reload with `LocalStorageFactory`; the remaining tasks are restored.
 6. Temporarily select `InMemoryStorageFactory`; tasks disappear on reload.
 7. Restore `LocalStorageFactory` and check the browser console for errors.
-
-See the [verification record](docs/week6-verification.md) for the browser checks
-completed on 21 October 2026.
 
 ## License
 
